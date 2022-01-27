@@ -12,7 +12,7 @@ import spotify_link_handler
 import musicbot
 
 
-class shitException(Exception):
+class AgeRestrictedException(Exception):
     pass
 
 
@@ -112,11 +112,9 @@ if __name__ == "__main__":
                 await ctx.message.add_reaction("👍")
                 await nowplaying(ctx)
                 print(f"Now playing {bot.nowplaying}!")
-            except shitException:
+            except AgeRestrictedException:
                 await ctx.channel.send("This Video ist age restricted, sorry!")
-                await skip(ctx, silent=True)
-                
-        
+                await skip(ctx, silent=True)    
         else:
             bot.playlist.append(song)
             await ctx.channel.send("Song added!")
