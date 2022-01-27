@@ -1,8 +1,8 @@
 import asyncio
 from secrets import bot_token, spotify_client_id, spotify_client_secret
 
-import discord
-import discord.ext.commands
+import disnake
+import disnake.ext.commands
 import spotipy
 import validators
 import youtube_dl
@@ -140,14 +140,17 @@ if __name__ == "__main__":
                 else:
                     song_url = song_info["formats"][0]["url"]
                     song_title = song_info["title"]
-
-                bot.voice_client.play(
-                    discord.FFmpegPCMAudio(
-                        song_url,
-                        before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
-                    ),
-                    after=playlist_handler,
-                )
+                #dumb error
+                try:
+                    bot.voice_client.play(
+                        disnake.FFmpegPCMAudio(
+                            song_url,
+                            before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
+                        ),
+                        after=playlist_handler,
+                    )
+                except TypeError:
+                    pass
                 bot.lastplayed = song
                 bot.nowplaying = song_title
             except youtube_dl.utils.DownloadError:
