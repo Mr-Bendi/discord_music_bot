@@ -82,10 +82,10 @@ if __name__ == "__main__":
         #error for no reason
         try:
             await bot.voice_client.stop()
-        except:
+        except TypeError:
             pass
-        print("Song skipped!")
         if silent is False:
+            print("Song skipped!")
             await ctx.channel.send("Skipped!")
             await ctx.message.add_reaction("👍")
         playlist_handler(ctx)
@@ -114,6 +114,7 @@ if __name__ == "__main__":
                 print(f"Now playing {bot.nowplaying}!")
             except AgeRestrictedException:
                 await ctx.channel.send("This Video ist age restricted, sorry!")
+                print("Age restricted Video skipped!")
                 await skip(ctx, silent=True)    
         else:
             bot.playlist.append(song)
@@ -150,7 +151,7 @@ if __name__ == "__main__":
                 bot.lastplayed = song
                 bot.nowplaying = song_title
             except youtube_dl.utils.DownloadError:
-                raise shitException("cum")
+                raise AgeRestrictedException()
 
         
 
