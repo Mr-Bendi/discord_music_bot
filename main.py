@@ -103,7 +103,10 @@ if __name__ == "__main__":
     @bot.command(aliases=["cp"])
     async def current_playlist(ctx, bot=bot):
         if len(bot.state[ctx.message.author.voice.channel.id]["playlist"]) != 0:
-            await ctx.channel.send(f"Current playlist: {bot.state[ctx.message.author.voice.channel.id]['playlist']}")
+            playlist_message = ""
+            for item in bot.state[ctx.message.author.voice.channel.id]['playlist']:
+                playlist_message += f"⏵ {item}\n"
+            await ctx.channel.send(f"Current playlist: {playlist_message}\n")
             print("Sent current playlist!")
         else:
             await ctx.channel.send("Playlist is empty!")
