@@ -44,7 +44,7 @@ if __name__ == "__main__":
     @bot.command(aliases=["j"])
     async def join(ctx, bot=bot):
         bot.state[ctx.message.author.voice.channel.id] = {
-            "voice_client": None, "looping": None, "nowplaying": None, "lastplayed": None, "playlist": []}
+            "voice_client": None, "looping": False, "nowplaying": None, "lastplayed": None, "playlist": []}
         bot.state[ctx.message.author.voice.channel.id]["voice_client"] = await ctx.message.author.voice.channel.connect(reconnect=True)
         print(
             f"Bot connected to voicechannel: \"{ctx.message.author.voice.channel.name}\"!")
@@ -75,10 +75,10 @@ if __name__ == "__main__":
     async def loop(ctx, bot=bot):
         if bot.state[ctx.message.author.voice.channel.id]["looping"]:
             await ctx.channel.send("No longer looping!")
-            print("Looping turned on!")
+            print("Looping turned off!")
         else:
             await ctx.channel.send("You are now looping!")
-            print("Looping turned off!")
+            print("Looping turned on!")
         bot.state[ctx.message.author.voice.channel.id]["looping"] = not bot.state[ctx.message.author.voice.channel.id]["looping"]
         await ctx.message.add_reaction("👍")
 
@@ -157,13 +157,12 @@ if __name__ == "__main__":
                         disnake.FFmpegPCMAudio(
                             song_url,
                             before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
-                        )
+                        ), after= lambda error: playlist_handler(voice_id)
                     )
-                except ValueError:
+                except disnake.errors.ClientException:
                     pass
                 bot.state[voice_id]["lastplayed"] = song
                 bot.state[voice_id]["nowplaying"] = song_title
-                playlist_handler(voice_id)
             except youtube_dl.utils.DownloadError:
                 raise AgeRestrictedException()
 
