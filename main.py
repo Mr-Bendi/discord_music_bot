@@ -34,7 +34,8 @@ if __name__ == "__main__":
         ],
     }
 
-    bot = musicbot.MusicBot({}, YTDL_OPTIONS, SPOTIFY_INSTANCE, command_prefix="-")
+    bot = musicbot.MusicBot(
+        {}, YTDL_OPTIONS, SPOTIFY_INSTANCE, command_prefix="-")
 
     @bot.event
     async def on_ready():
@@ -42,9 +43,11 @@ if __name__ == "__main__":
 
     @bot.command(aliases=["j"])
     async def join(ctx, bot=bot):
-        bot.state[ctx.message.author.voice.channel.id] = {"voice_client": None, "looping": None, "nowplaying": None, "lastplayed": None, "playlist": []}
+        bot.state[ctx.message.author.voice.channel.id] = {
+            "voice_client": None, "looping": None, "nowplaying": None, "lastplayed": None, "playlist": []}
         bot.state[ctx.message.author.voice.channel.id]["voice_client"] = await ctx.message.author.voice.channel.connect(reconnect=True)
-        print(f"Bot connected to voicechannel: \"{ctx.message.author.voice.channel.name}\"!")
+        print(
+            f"Bot connected to voicechannel: \"{ctx.message.author.voice.channel.name}\"!")
         await ctx.message.add_reaction("👍")
 
     @bot.command(aliases=["bye"])
@@ -81,7 +84,7 @@ if __name__ == "__main__":
 
     @bot.command(aliases=["s"])
     async def skip(ctx, bot=bot, silent=False):
-        #error for no reason
+        # error for no reason
         try:
             await bot.state[ctx.message.author.voice.channel.id]["voice_client"].stop()
         except TypeError:
@@ -110,16 +113,19 @@ if __name__ == "__main__":
     async def play(ctx, *, song, bot=bot):
         if not bot.state[ctx.message.author.voice.channel.id]["voice_client"].is_playing():
             try:
-                play_yt_song(song, bot.YTDL_OPTIONS, ctx.message.author.voice.channel.id)
+                play_yt_song(song, bot.YTDL_OPTIONS,
+                             ctx.message.author.voice.channel.id)
                 await ctx.message.add_reaction("👍")
                 await nowplaying(ctx)
-                print(f"Now playing {bot.state[ctx.message.author.voice.channel.id]['nowplaying']}!")
+                print(
+                    f"Now playing {bot.state[ctx.message.author.voice.channel.id]['nowplaying']}!")
             except AgeRestrictedException:
                 await ctx.channel.send("This Video ist age restricted, sorry!")
                 print("Age restricted Video skipped!")
-                await skip(ctx, silent=True)    
+                await skip(ctx, silent=True)
         else:
-            bot.state[ctx.message.author.voice.channel.id]["playlist"].append(song)
+            bot.state[ctx.message.author.voice.channel.id]["playlist"].append(
+                song)
             await ctx.channel.send("Song added!")
             print(f"Added \"{song}\" to playlist!")
             await ctx.message.add_reaction("👍")
@@ -142,7 +148,7 @@ if __name__ == "__main__":
                 else:
                     song_url = song_info["formats"][0]["url"]
                     song_title = song_info["title"]
-                #dumb error
+                # dumb error
                 try:
                     bot.state[voice_id]["voice_client"].play(
                         disnake.FFmpegPCMAudio(
@@ -158,15 +164,14 @@ if __name__ == "__main__":
             except youtube_dl.utils.DownloadError:
                 raise AgeRestrictedException()
 
-        
-
     def playlist_handler(voice_id, bot=bot):
         if not bot.state[voice_id]["looping"]:
             if len(bot.state[voice_id]["playlist"]) != 0:
-                play_yt_song(bot.state[voice_id]["playlist"].pop(0), bot.YTDL_OPTIONS, voice_id)
+                play_yt_song(bot.state[voice_id]["playlist"].pop(
+                    0), bot.YTDL_OPTIONS, voice_id)
         else:
-            play_yt_song(bot.state[voice_id]["lastplayed"], bot.YTDL_OPTIONS, voice_id)
-
+            play_yt_song(bot.state[voice_id]["lastplayed"],
+                         bot.YTDL_OPTIONS, voice_id)
 
     #######
     bot.run(bot_token)
